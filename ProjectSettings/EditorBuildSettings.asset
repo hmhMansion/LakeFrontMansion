@@ -6,8 +6,50 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Core/Boot.unity
+    guid: 930e135871f82df47a87655430f80b3a
+  - enabled: 1
+    path: Assets/Scenes/Core/MainMenu.unity
+    guid: aa019dfd9945b2b4b886959bcf5df00e
+  - enabled: 1
+    path: Assets/Scenes/Floor1/F1_Corridor.unity
+    guid: d7d628788c74b6242a4e496725c8a2ba
+  - enabled: 1
+    path: Assets/Scenes/Floor1/F1_Room01.unity
+    guid: 236b25e5cf97c144eab61eb1f88ceb34
+  - enabled: 1
+    path: Assets/Scenes/Floor1/F1_Room02.unity
+    guid: 5b1965ffda0c8fe4da0cc750deb66aa4
+  - enabled: 1
+    path: Assets/Scenes/Floor1/F1_Room03.unity
+    guid: d108ef26f62ca3545825374ea67eb193
+  - enabled: 1
+    path: Assets/Scenes/Floor2/F2_Corridor.unity
+    guid: 54925e2540e9e2743938493dae90b919
+  - enabled: 1
+    path: Assets/Scenes/Floor2/F2_Room01.unity
+    guid: 4182c5aaecb924f47a56ff76b76bf263
+  - enabled: 1
+    path: Assets/Scenes/Floor2/F2_Room02.unity
+    guid: e82684099287c5f4db359487f2756fb4
+  - enabled: 1
+    path: Assets/Scenes/Floor2/F2_Room03.unity
+    guid: 64d49d7ff7623c94eb68616362efd9bd
+  - enabled: 1
+    path: Assets/Scenes/Floor3/F3_Corridor.unity
+    guid: 2a82b30ebf3f809418eea9ea57e351b1
+  - enabled: 1
+    path: Assets/Scenes/Floor3/F3_GuestRoom01.unity
+    guid: 9ffb81a637aaa594ab3f21b708e990ed
+  - enabled: 1
+    path: Assets/Scenes/Floor3/F3_GuestRoom02.unity
+    guid: 058583c628d4b4f41a460435fc5c317a
+  - enabled: 1
+    path: Assets/Scenes/Floor3/F3_GuestRoom03.unity
+    guid: 2d4df4b8c6734f44695ff8e17e37bc7e
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: ddac7c7bbfd4a6d44b52a602ad800cb5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

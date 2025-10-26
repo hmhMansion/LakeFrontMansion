@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace LakeFrontMansion.SceneManagement
 {
@@ -28,7 +29,15 @@ namespace LakeFrontMansion.SceneManagement
         [Tooltip("플레이어가 가까이 있을 때 표시할 텍스트 (E키를 누르세요 등)")]
         public GameObject interactionUI;
 
+        [Header("조건 설정")]
+        [Tooltip("조건 없이 무조건 전환 가능하게 할지 여부")]
+        public bool alwaysAllowTransition = true;
+
+        [Tooltip("전환을 위해 만족해야 하는 조건들 (비어있으면 조건 없음)")]
+        public MonoBehaviour[] transitionConditions;
+
         private bool playerNearby = false;
+        private ISceneTransitionCondition[] conditionComponents;
 
         private void Start()
         {
@@ -42,6 +51,20 @@ namespace LakeFrontMansion.SceneManagement
             if (interactionUI != null)
             {
                 interactionUI.SetActive(false);
+            }
+
+            // 조건 컴포넌트들을 캐싱
+            if (transitionConditions != null && transitionConditions.Length > 0)
+            {
+                conditionComponents = transitionConditions
+                    .Where(c => c != null && c is ISceneTransitionCondition)
+                    .Cast<ISceneTransitionCondition>()
+                    .ToArray();
+
+                if (conditionComponents.Length != transitionConditions.Length)
+                {
+                    Debug.LogWarning($"{gameObject.name}: 일부 조건 컴포넌트가 ISceneTransitionCondition을 구현하지 않습니다.");
+                }
             }
         }
 
@@ -102,6 +125,37 @@ namespace LakeFrontMansion.SceneManagement
         }
 
         /// <summary>
+        /// 모든 조건이 만족되었는지 확인
+        /// </summary>
+        /// <returns>조건을 만족하거나 조건 체크를 무시할 경우 true</returns>
+        private bool CheckConditions()
+        {
+            // 무조건 허용 옵션이 켜져있으면 바로 true
+            if (alwaysAllowTransition)
+            {
+                return true;
+            }
+
+            // 조건이 없으면 true
+            if (conditionComponents == null || conditionComponents.Length == 0)
+            {
+                return true;
+            }
+
+            // 모든 조건을 체크
+            foreach (var condition in conditionComponents)
+            {
+                if (!condition.IsSatisfied())
+                {
+                    Debug.Log($"{gameObject.name}: 조건 미충족 - {condition.GetDescription()}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Scene 전환 실행
         /// </summary>
         private void TransitionToScene()
@@ -109,6 +163,13 @@ namespace LakeFrontMansion.SceneManagement
             if (string.IsNullOrEmpty(targetSceneName))
             {
                 Debug.LogError($"{gameObject.name}: 타겟 Scene 이름이 설정되지 않았습니다!");
+                return;
+            }
+
+            // 조건 체크
+            if (!CheckConditions())
+            {
+                Debug.Log($"{gameObject.name}: Scene 전환 조건이 만족되지 않았습니다.");
                 return;
             }
 

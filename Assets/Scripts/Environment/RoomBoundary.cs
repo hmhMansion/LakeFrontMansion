@@ -12,13 +12,36 @@ namespace LakeFrontMansion.Environment
         [Tooltip("경계선 색상 (에디터에서만 보임)")]
         public Color gizmoColor = Color.red;
 
+        private Collider2D cachedCollider;
+
         private void Awake()
         {
             // Collider2D가 있는지 확인
-            if (GetComponent<Collider2D>() == null)
+            cachedCollider = GetComponent<Collider2D>();
+            if (cachedCollider == null)
             {
                 Debug.LogWarning($"{gameObject.name}: Collider2D 컴포넌트가 필요합니다!");
             }
+        }
+
+        /// <summary>
+        /// 방의 경계 영역을 반환합니다
+        /// </summary>
+        public Bounds GetBounds()
+        {
+            if (cachedCollider == null)
+            {
+                cachedCollider = GetComponent<Collider2D>();
+            }
+
+            if (cachedCollider != null)
+            {
+                return cachedCollider.bounds;
+            }
+
+            // Collider가 없으면 기본 Bounds 반환
+            Debug.LogWarning($"{gameObject.name}: Collider2D가 없어 기본 Bounds를 반환합니다.");
+            return new Bounds(transform.position, Vector3.one * 100f);
         }
 
         // 에디터에서 경계선 표시

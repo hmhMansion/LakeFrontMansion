@@ -29,6 +29,10 @@ namespace LakeFrontMansion.SceneManagement
         [Tooltip("플레이어가 가까이 있을 때 표시할 텍스트 (E키를 누르세요 등)")]
         public GameObject interactionUI;
 
+        [Header("대화 설정")]
+        [Tooltip("E 버튼을 처음 눌렀을 때 표시할 Dialogue Box (설정 시 대화 후 씬 전환)")]
+        public GameObject dialogueBox;
+
         [Header("조건 설정")]
         [Tooltip("조건 없이 무조건 전환 가능하게 할지 여부")]
         public bool alwaysAllowTransition = true;
@@ -37,6 +41,7 @@ namespace LakeFrontMansion.SceneManagement
         public MonoBehaviour[] transitionConditions;
 
         private bool playerNearby = false;
+        private bool isDialogueShown = false;
         private ISceneTransitionCondition[] conditionComponents;
 
         private void Start()
@@ -51,6 +56,12 @@ namespace LakeFrontMansion.SceneManagement
             if (interactionUI != null)
             {
                 interactionUI.SetActive(false);
+            }
+
+            // Dialogue Box 숨기기
+            if (dialogueBox != null)
+            {
+                dialogueBox.SetActive(false);
             }
 
             // 조건 컴포넌트들을 캐싱
@@ -76,7 +87,16 @@ namespace LakeFrontMansion.SceneManagement
                 // E키나 마우스 클릭으로 전환
                 if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
                 {
-                    TransitionToScene();
+                    // Dialogue Box가 설정되어 있고 아직 표시하지 않았다면
+                    if (dialogueBox != null && !isDialogueShown)
+                    {
+                        ShowDialogue();
+                    }
+                    else
+                    {
+                        // Dialogue Box가 없거나 이미 표시했다면 Scene 전환
+                        TransitionToScene();
+                    }
                 }
             }
         }
@@ -121,6 +141,13 @@ namespace LakeFrontMansion.SceneManagement
                 {
                     interactionUI.SetActive(false);
                 }
+
+                // Dialogue Box 숨기기 및 상태 초기화
+                if (dialogueBox != null)
+                {
+                    dialogueBox.SetActive(false);
+                    isDialogueShown = false;
+                }
             }
         }
 
@@ -153,6 +180,19 @@ namespace LakeFrontMansion.SceneManagement
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Dialogue Box 표시
+        /// </summary>
+        private void ShowDialogue()
+        {
+            if (dialogueBox != null)
+            {
+                dialogueBox.SetActive(true);
+                isDialogueShown = true;
+                Debug.Log($"{gameObject.name}: Dialogue Box 표시 (E를 다시 눌러 씬 전환)");
+            }
         }
 
         /// <summary>

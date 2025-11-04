@@ -239,7 +239,15 @@ namespace LakeFrontMansion.Editor
                 GameObject canvasObj = new GameObject("Canvas");
                 canvas = canvasObj.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
+
+                // Canvas Scale 명시적 설정 (0,0,0이면 UI가 안 보이는 문제 방지)
+                canvasObj.transform.localScale = Vector3.one;
+
+                // Canvas Scaler 설정 (다양한 해상도 대응)
+                UnityEngine.UI.CanvasScaler scaler = canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
+                scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1920, 1080);
+
                 canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             }
 

@@ -19,6 +19,7 @@ namespace LakeFrontMansion.Player
 
         private Rigidbody2D rb;
         private Vector2 movement;
+        private Vector2 lastMovement;
 
         private void Awake()
         {
@@ -27,6 +28,9 @@ namespace LakeFrontMansion.Player
             // Rigidbody2D 기본 설정
             rb.gravityScale = 0f; // 2D 탑다운이므로 중력 없음
             rb.freezeRotation = true; // 회전 방지
+
+            // 초기 방향은 아래
+            lastMovement = new Vector2(0, -1);
         }
 
         private void Update()
@@ -41,12 +45,20 @@ namespace LakeFrontMansion.Player
                 movement.Normalize();
             }
 
+            // 마지막 이동 방향 저장 (움직이고 있을 때만)
+            if (movement.magnitude > 0.01f)
+            {
+                lastMovement = movement;
+            }
+
             // 애니메이션 파라미터 설정 (Animator가 있는 경우)
             if (animator != null)
             {
                 animator.SetFloat("Horizontal", movement.x);
                 animator.SetFloat("Vertical", movement.y);
                 animator.SetFloat("Speed", movement.magnitude);
+                animator.SetFloat("LastHorizontal", lastMovement.x);
+                animator.SetFloat("LastVertical", lastMovement.y);
             }
         }
 

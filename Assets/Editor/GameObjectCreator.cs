@@ -173,6 +173,152 @@ namespace LakeFrontMansion.Editor
             Debug.Log("가구가 생성되었습니다! 갈색 사각형이 가구입니다. 플레이어가 관통하지 못합니다.");
         }
 
+        [MenuItem("GameObject/LakeFrontMansion/Create Wall", false, 4)]
+        public static void CreateWall()
+        {
+            // Wall GameObject 생성
+            GameObject wall = new GameObject("Wall");
+
+            // SpriteRenderer 추가
+            SpriteRenderer sr = wall.AddComponent<SpriteRenderer>();
+            sr.sortingOrder = 0; // maru(-10)와 door(5) 사이
+
+            // wall 스프라이트 로드
+            string[] guids = AssetDatabase.FindAssets("wall_0 t:Sprite");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                sr.sprite = wallSprite;
+
+                Debug.Log($"wall 스프라이트 로드 성공: {path}");
+            }
+            else
+            {
+                Debug.LogWarning("wall_0 스프라이트를 찾을 수 없습니다!");
+                sr.sprite = CreateSquareSprite(64, new Color(0.5f, 0.5f, 0.5f));
+            }
+
+            // Scene에 배치
+            wall.transform.position = Vector3.zero;
+
+            // 선택 상태로 변경
+            Selection.activeGameObject = wall;
+
+            Debug.Log("Wall이 생성되었습니다! Door 위치에 맞게 배치하세요.");
+        }
+
+        [MenuItem("GameObject/LakeFrontMansion/Create Corridor Floor (Tiled)", false, 5)]
+        public static void CreateCorridorFloor()
+        {
+            // Room Prefab 경로
+            string prefabPath = "Assets/Prefabs/Room.prefab";
+
+            // 기존 prefab이 있는지 확인
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+            if (prefab == null)
+            {
+                // Prefab이 없으면 새로 생성
+                GameObject floor = new GameObject("Room");
+
+                SetupCorridorFloor(floor);
+
+                // Prefab으로 저장
+                PrefabUtility.SaveAsPrefabAsset(floor, prefabPath);
+                Object.DestroyImmediate(floor);
+
+                Debug.Log($"Room prefab이 생성되었습니다: {prefabPath}");
+            }
+            else
+            {
+                // Prefab이 있으면 업데이트
+                GameObject tempObj = new GameObject("Room_Temp");
+                SetupCorridorFloor(tempObj);
+
+                // 기존 prefab을 새 설정으로 덮어쓰기
+                PrefabUtility.SaveAsPrefabAsset(tempObj, prefabPath);
+                Object.DestroyImmediate(tempObj);
+
+                Debug.Log($"Room prefab이 업데이트되었습니다: {prefabPath}");
+            }
+
+            // Prefab 인스턴스를 씬에 생성
+            GameObject roomPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(roomPrefab);
+            instance.transform.position = Vector3.zero;
+
+            // 선택 상태로 변경
+            Selection.activeGameObject = instance;
+
+            Debug.Log("복도 바닥(Room) Prefab 인스턴스가 생성되었습니다!\n" +
+                      "- SpriteRenderer > Size를 조정해서 복도 크기를 변경할 수 있습니다.\n" +
+                      "- EdgeCollider2D의 Points도 함께 조정해주세요.\n" +
+                      "- maru 타일이 자동으로 반복됩니다.");
+        }
+
+        /// <summary>
+        /// 복도 바닥 오브젝트 설정
+        /// </summary>
+        private static void SetupCorridorFloor(GameObject floor)
+        {
+            // SpriteRenderer 추가
+            SpriteRenderer sr = floor.AddComponent<SpriteRenderer>();
+            sr.sortingOrder = -10; // 가장 뒤에 렌더링
+
+            // maru 스프라이트 로드
+            string[] guids = AssetDatabase.FindAssets("maru_0 t:Sprite");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                Sprite maruSprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                sr.sprite = maruSprite;
+
+                // Tiled 모드로 설정
+                sr.drawMode = SpriteDrawMode.Tiled;
+                sr.size = new Vector2(20, 10); // 복도 크기 (가로 20, 세로 10)
+
+                Debug.Log($"maru 스프라이트 로드 성공: {path}");
+            }
+            else
+            {
+                Debug.LogWarning("maru_0 스프라이트를 찾을 수 없습니다!");
+                sr.sprite = CreateSquareSprite(512, new Color(0.8f, 0.8f, 0.8f));
+                sr.drawMode = SpriteDrawMode.Tiled;
+                sr.size = new Vector2(20, 10);
+            }
+
+            // Rigidbody2D 추가 (Static)
+            Rigidbody2D rb = floor.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Static;
+
+            // EdgeCollider2D 추가 (직사각형 테두리)
+            EdgeCollider2D edge = floor.AddComponent<EdgeCollider2D>();
+
+            // Tiled 모드에서는 Size가 World 단위이므로, EdgeCollider도 그에 맞춰야 함
+            // SpriteRenderer의 size를 가져옴
+            float spriteWidth = sr.size.x;
+            float spriteHeight = sr.size.y;
+
+            float halfWidth = spriteWidth / 2f;
+            float halfHeight = spriteHeight / 2f;
+
+            Vector2[] points = new Vector2[]
+            {
+                new Vector2(-halfWidth, -halfHeight),  // 왼쪽 아래
+                new Vector2(halfWidth, -halfHeight),   // 오른쪽 아래
+                new Vector2(halfWidth, halfHeight),    // 오른쪽 위
+                new Vector2(-halfWidth, halfHeight),   // 왼쪽 위
+                new Vector2(-halfWidth, -halfHeight)   // 왼쪽 아래 (닫힘)
+            };
+            edge.points = points;
+
+            Debug.Log($"EdgeCollider2D 크기: {spriteWidth} x {spriteHeight}, Points: {points.Length}개");
+
+            // RoomBoundary 스크립트 추가
+            floor.AddComponent<RoomBoundary>();
+        }
+
         [MenuItem("GameObject/LakeFrontMansion/Create Build Settings Helper", false, 10)]
         public static void OpenBuildSettingsHelper()
         {

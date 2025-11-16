@@ -42,7 +42,7 @@ namespace LakeFrontMansion.Player
             }
 
             // 현재 씬에서 RoomBoundary 찾기 (없으면 경계 제한 없이 동작)
-            currentRoom = FindObjectOfType<RoomBoundary>();
+            currentRoom = FindFirstObjectByType<RoomBoundary>();
 
             if (currentRoom == null && enableBoundary)
             {

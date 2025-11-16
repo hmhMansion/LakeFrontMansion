@@ -23,7 +23,7 @@ namespace LakeFrontMansion.SceneManagement
 
         [Header("플레이어 설정")]
         [Tooltip("플레이어 태그 (충돌 감지용)")]
-        public string playerTag = "Player";
+        public string characterTag = "Character";
 
         [Header("UI 표시")]
         [Tooltip("플레이어가 가까이 있을 때 표시할 텍스트 (E키를 누르세요 등)")]
@@ -36,7 +36,7 @@ namespace LakeFrontMansion.SceneManagement
         [Tooltip("전환을 위해 만족해야 하는 조건들 (비어있으면 조건 없음)")]
         public MonoBehaviour[] transitionConditions;
 
-        private bool playerNearby = false;
+        private bool characterNearby = false;
         private ISceneTransitionCondition[] conditionComponents;
 
         private void Start()
@@ -71,7 +71,7 @@ namespace LakeFrontMansion.SceneManagement
         private void Update()
         {
             // 클릭 방식 + 플레이어가 근처에 있을 때
-            if (useClick && playerNearby)
+            if (useClick && characterNearby)
             {
                 // E키나 마우스 클릭으로 전환
                 if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
@@ -92,9 +92,9 @@ namespace LakeFrontMansion.SceneManagement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag(playerTag))
+            if (other.CompareTag(characterTag))
             {
-                playerNearby = true;
+                characterNearby = true;
 
                 // UI 표시
                 if (interactionUI != null)
@@ -112,9 +112,9 @@ namespace LakeFrontMansion.SceneManagement
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (other.CompareTag(playerTag))
+            if (other.CompareTag(characterTag))
             {
-                playerNearby = false;
+                characterNearby = false;
 
                 // UI 숨기기
                 if (interactionUI != null)

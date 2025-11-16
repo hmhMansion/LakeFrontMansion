@@ -80,7 +80,7 @@ namespace LakeFrontMansion.Editor
             trigger.targetSceneName = ""; // Inspector에서 설정 필요
             trigger.useClick = true;
             trigger.useTrigger = false;
-            trigger.playerTag = "Player";
+            trigger.characterTag = "Character";
 
             // 상호작용 UI 생성
             GameObject uiObject = CreateInteractionUI(door.transform);
@@ -232,7 +232,7 @@ namespace LakeFrontMansion.Editor
         private static GameObject CreateInteractionUI(Transform parent)
         {
             // Canvas가 있는지 확인
-            Canvas canvas = Object.FindObjectOfType<Canvas>();
+            Canvas canvas = Object.FindFirstObjectByType<Canvas>();
             if (canvas == null)
             {
                 // Canvas 생성
